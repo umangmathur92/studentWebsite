@@ -2,8 +2,12 @@ var searchResults;
 
 $(document).ready(function () {
     populateSearchCriteriaDropdownList();
+    searchStudentDatabase();
     $(btnSearch).click(function () {
         searchStudentDatabase();
+    });
+    $(btnAddStudent).click(function () {
+        openAddStudentPage();
     });
 });
 
@@ -21,38 +25,21 @@ function searchStudentDatabase() {
     });
 }
 
-// function searchMovieDatabase() {
-//     const key = $("#txtSearch").val().trim();
-//     const year = $("#btnYearDropdown").text().trim();
-//     const rating = $("#btnPopularityDropdown").text().trim().charAt(0);
-//     var sortOrder = $("#btnSortingDropdown").text().trim();
-//     sortOrder = (sortOrder=='Ascending') ? 'ASC' : 'DESC';
-//     $("#search_ul").empty();
-//     const body = {
-//         search_query: key, 
-//         order_by: sortOrder,
-//         year: year,
-//         rating: rating
-//     };
-//     $.post("/search/", body, function (response) {
-//         searchResults = response;
-//         generateListings(response);
-//     });
-// }
-
 function generateListings(studentList) {
     studentList.forEach(student => {
         $('.search_ul').append(
             '<li class="search_li">' +       
-            '<img src="/images/avatar.jpeg">' + '</img>' +
+            '<img src="/images/avatar.jpeg" class="avatar_icon">' + '</img>' +
             '<h3 class="li_title">' + student.firstname + ' ' +  student.lastname + '</h3>' +
+            '<h6 class="li_title">' + 'SFSU ID: '  + student.studentid + '</h6>' +
             '<h6 class="li_title">' + 'Email: ' + student.email + '</h6>' +
             '<h6 class="li_title">' + 'Address: '  + student.address + '</h6>' +
             '<h6 class="li_title">' + 'GPA: '  + student.gpa + '</h6>' +
+            '<img src="/images/trash.png" class="trash_icon">' + '</img>' +
             '</li>'
         );
     });
-    //setUpListingListeners(studentList);
+    setUpListingListeners(studentList);
 }
 
 function populateSearchCriteriaDropdownList() {
@@ -90,95 +77,32 @@ function populateSearchCriteriaDropdownList() {
     return anchorElement;
 }
 
-function populateRatingSelectionDropdownList() {
-    var popularityDropdownList = document.getElementById('popularityDropdown');
-    let anchorElement = document.createElement('a');
-        anchorElement.setAttribute('class', 'dropdown-item');
-        anchorElement.setAttribute('onmouseover', '');
-        anchorElement.setAttribute('style', 'cursor: pointer;');
-        anchorElement.innerHTML = '-';
-        anchorElement.addEventListener("click", function (event) {
-            $("#btnPopularityDropdown").text('-');
-            $("#btnPopularityDropdown").val('-');
-        });
-        popularityDropdownList.appendChild(anchorElement);
-    for (let num = 1; num <= 5; num++) {
-        let anchorElement = document.createElement('a');
-        anchorElement.setAttribute('class', 'dropdown-item');
-        anchorElement.setAttribute('onmouseover', '');
-        anchorElement.setAttribute('style', 'cursor: pointer;');
-        anchorElement.innerHTML = num + ' Stars or Greater';
-        anchorElement.addEventListener("click", function (event) {
-            $("#btnPopularityDropdown").text(num + ' Stars or Greater');
-            $("#btnPopularityDropdown").val(num + ' Stars or Greater');
-        });
-        popularityDropdownList.appendChild(anchorElement);
-    }
-    return anchorElement;
-}
-
-// function populateYearSelectionDropdownList() {
-//     var yearDropdownList = document.getElementById('yearDropdown');
-//     let anchorElement = document.createElement('a');
-//         anchorElement.setAttribute('class', 'dropdown-item');
-//         anchorElement.setAttribute('onmouseover', '');
-//         anchorElement.setAttribute('style', 'cursor: pointer;');
-//         anchorElement.innerHTML = '-';
-//         anchorElement.addEventListener("click", function (event) {
-//             $("#btnYearDropdown").text('-');
-//             $("#btnYearDropdown").val('-');
-//         });
-//         yearDropdownList.appendChild(anchorElement);
-//     for (let yr = 2000; yr <= 2018; yr++) {
-//         let anchorElement = document.createElement('a');
-//         anchorElement.setAttribute('class', 'dropdown-item');
-//         anchorElement.setAttribute('onmouseover', '');
-//         anchorElement.setAttribute('style', 'cursor: pointer;');
-//         anchorElement.innerHTML = yr;
-//         anchorElement.addEventListener("click", function (event) {
-//             $("#btnYearDropdown").text(yr);
-//             $("#btnYearDropdown").val(yr);
-//         });
-//         yearDropdownList.appendChild(anchorElement);
-//     }
-//     return anchorElement;
-// }
-
-function populateSortingSelectionDropdownList() {
-    var yearDropdownList = document.getElementById('sortingDropdown');
-    let anchorElement = document.createElement('a');
-        anchorElement.setAttribute('class', 'dropdown-item');
-        anchorElement.setAttribute('onmouseover', '');
-        anchorElement.setAttribute('style', 'cursor: pointer;');
-        anchorElement.innerHTML = 'Ascending';
-        anchorElement.addEventListener("click", function (event) {
-            $("#btnSortingDropdown").text('Ascending');
-            $("#btnSortingDropdown").val('Ascending');
-        });
-        yearDropdownList.appendChild(anchorElement);
-        let anchorElement2 = document.createElement('a');
-        anchorElement2.setAttribute('class', 'dropdown-item');
-        anchorElement2.setAttribute('onmouseover', '');
-        anchorElement2.setAttribute('style', 'cursor: pointer;');
-        anchorElement2.innerHTML = 'Descending';
-        anchorElement2.addEventListener("click", function (event) {
-            $("#btnSortingDropdown").text('Descending');
-            $("#btnSortingDropdown").val('Descending');
-        });
-        yearDropdownList.appendChild(anchorElement2);
-    return anchorElement;
-}
-
-function getFormattedDateString(inputDateStr) {
-    //Input date string format: YYYY-MM-DDTHH:MM:SSZ
-    var date = Date.parse(inputDateStr); 
-    return moment(date).format('MMMM DD, YYYY');
-}
-
-function setUpListingListeners(movieList) {
-    $('.search_li').click(function () {
-        let index = $(this).index();
-        let movie = movieList[index];
-        window.open('/moviedetails' + '/' + movie.mid);
+function setUpListingListeners(studentList) {
+    $('.trash_icon').click(function () {
+        let index = $(this).parent().index();
+        let student = studentList[index];
+        confirmDelete(student);
     });
+}
+
+function confirmDelete(student) {
+    if (confirm("Are you sure you want to delete this student's record ?")) {
+        const body = {
+            studentid: student.studentid, 
+        };
+        $.post("/deletestudent/", body, function (response) {
+            if (response=='true') {
+                window.alert('Student record deleted successfully!!');
+                window.location.reload(true);
+            } else {
+                window.alert('Failed to delete student record !!');
+            }
+        });
+    } else {
+        //Do nothing
+    }
+}
+
+function openAddStudentPage(argument) {
+    window.location.href='/addnewstudent'
 }

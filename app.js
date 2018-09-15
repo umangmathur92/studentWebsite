@@ -9,6 +9,8 @@ var bodyParser = require('body-parser');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var searchRouter = require('./routes/search');
+var deleteRouter = require('./routes/deletestudent');
+var addRouter = require('./routes/addnewstudent');
 
 if (process.env.NODE_ENV === 'development') {
     require("dotenv").config();
@@ -38,6 +40,8 @@ models.sequelize.sync().then(function () {
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/search', searchRouter);
+app.use('/deletestudent', deleteRouter);
+app.use('/addnewstudent', addRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
