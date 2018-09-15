@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const pgp = require('pg-promise')();
-require('dotenv').config();
-const dbConnection = pgp(process.env.DATABASE_URL);
+const dbConnection = require('../db/index.js');
 
 router.post('/', function(req, res, next) {
     var studentid = req.body.studentid;

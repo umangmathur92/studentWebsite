@@ -1,4 +1,4 @@
 const pgp = require('pg-promise')();
 require('dotenv').config();
-const connection = pgp(process.env.DATABASE_URL);
-module.exports = connection;
+const dbConnection = pgp(process.env.DATABASE_URL);
+module.exports = dbConnection;
